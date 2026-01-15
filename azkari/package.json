@@ -1,0 +1,81 @@
+{
+  "name": "azkari",
+  "displayName": "Azkari - أذكاري",
+  "description": "Take Ager while you are coding",
+  "version": "1.0.0",
+  "publisher": "Mohamed Emad",
+  "icon": "images/icon.png",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "dhikr",
+    "أذكار",
+    "islamic",
+    "mindfulness",
+    "spirituality",
+    "arabic",
+    "reminders"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "azkari.start",
+        "title": "Azkari: Start Dhikr Reminders"
+      },
+      {
+        "command": "azkari.stop",
+        "title": "Azkari: Stop Dhikr Reminders"
+      },
+      {
+        "command": "azkari.showNow",
+        "title": "Azkari: Show Dhikr Now"
+      },
+      {
+        "command": "azkari.setInterval",
+        "title": "Azkari: Set Dhikr Timer Interval"
+      }
+    ],
+    "configuration": {
+      "title": "Azkari",
+      "properties": {
+        "azkari.intervalMinutes": {
+          "type": "number",
+          "default": 3,
+          "minimum": 1,
+          "maximum": 60,
+          "description": "Interval in minutes between Dhikr reminders."
+        },
+        "azkari.autoStart": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically start Dhikr reminders when VS Code opens."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "lint": "eslint src --ext ts"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.85.0",
+    "@types/node": "^20.x",
+    "typescript": "^5.3.0",
+    "@vscode/vsce": "^2.22.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/azkari"
+  },
+  "license": "MIT"
+}
