@@ -46,13 +46,13 @@ Access via `File > Preferences > Settings` and search for "Azkari":
 }
 
 ## Included Dhikr 📿
-
-1. سُبْحَانَ اللَّهِ (Glory be to Allah)
-2. الْحَمْدُ لِلَّهِ (Praise be to Allah)
-3. لَا إِلَهَ إِلَّا اللَّهُ (There is no god but Allah)
-4. اللَّهُ أَكْبَرُ (Allah is the Greatest)
-5. لَا حَوْل وَلَا قُوَّة إِلَّا بِاَلله (There is no power except with Allah)
-6. اللَّهُــمَّ صـَلِّ وَسَـــلِّمْ وبارك على سيدنا مُحمَّد وآله ﷺ (Blessings upon Prophet Muhammad)
+1. أَسْتَغْفِرُ اللَّه (Astaghfirullah)
+2. سُبْحَانَ اللَّهِ (Glory be to Allah)
+3. الْحَمْدُ لِلَّهِ (Praise be to Allah)
+4. لَا إِلَهَ إِلَّا اللَّهُ (There is no god but Allah)
+5. اللَّهُ أَكْبَرُ (Allah is the Greatest)
+6. لَا حَوْل وَلَا قُوَّة إِلَّا بِاَلله (There is no power except with Allah)
+7. اللَّهُــمَّ صـَلِّ وَسَـــلِّمْ وبارك على سيدنا مُحمَّد وآله ﷺ (Blessings upon Prophet Muhammad)
 
 ## Contributing 🤝
 
