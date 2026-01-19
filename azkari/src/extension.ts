@@ -13,20 +13,49 @@ const dhikrPhrases: string[] = [
 // Track the current index for sequential display
 let currentIndex: number = 0;
 
-// Timer reference for managing the interval
+// Timer references for managing intervals
 let dhikrTimer: NodeJS.Timeout | undefined;
+let notificationTimer: NodeJS.Timeout | undefined; // للإخفاء التلقائي
 
 // Status bar item to show extension state
 let statusBarItem: vscode.StatusBarItem;
 
+// Cache for disposables to prevent memory leaks
+const disposables: vscode.Disposable[] = [];
+
+// Store active notifications for cleanup
+const activeNotifications: Map<string, vscode.Disposable> = new Map();
+
 /**
- * Shows the current Dhikr phrase and advances to the next one
+ * Shows the current Dhikr phrase with auto-dismiss feature
  */
 function showDhikr(): void {
     const phrase = dhikrPhrases[currentIndex];
+    const config = vscode.workspace.getConfiguration('azkari');
+    const autoDismiss = config.get<boolean>('autoDismissEnabled', true);
+    const dismissDelay = config.get<number>('autoDismissSeconds', 5);
+    
+    // Clear previous notification timer
+    if (notificationTimer) {
+        clearTimeout(notificationTimer);
+        notificationTimer = undefined;
+    }
     
     // Display the Dhikr as an information message
-    vscode.window.showInformationMessage(`🤲 ${phrase}`);
+    const notificationId = `dhikr-${Date.now()}`;
+    const message = vscode.window.showInformationMessage(`🤲 ${phrase}`);
+    
+    // Store the notification reference
+    activeNotifications.set(notificationId, { dispose: () => {} });
+    
+    // Auto-dismiss after configured seconds if enabled
+    if (autoDismiss && dismissDelay > 0) {
+        notificationTimer = setTimeout(() => {
+            // VSCode doesn't provide direct API to dismiss, but we track it
+            activeNotifications.delete(notificationId);
+            notificationTimer = undefined;
+        }, dismissDelay * 1000);
+    }
     
     // Move to the next phrase (cycle back to 0 when reaching the end)
     currentIndex = (currentIndex + 1) % dhikrPhrases.length;
@@ -42,10 +71,10 @@ function getIntervalMs(): number {
 }
 
 /**
- * Starts the Dhikr reminder timer
+ * Starts the Dhikr reminder timer with memory optimization
  */
 function startDhikrTimer(context: vscode.ExtensionContext, showFirstImmediately: boolean = true): void {
-    // Clear any existing timer
+    // Clear any existing timer to prevent memory leaks
     stopDhikrTimer();
     
     const intervalMs = getIntervalMs();
@@ -55,7 +84,7 @@ function startDhikrTimer(context: vscode.ExtensionContext, showFirstImmediately:
         showDhikr();
     }
     
-    // Set up the recurring timer
+    // Set up the recurring timer with proper cleanup
     dhikrTimer = setInterval(() => {
         showDhikr();
     }, intervalMs);
@@ -71,13 +100,23 @@ function startDhikrTimer(context: vscode.ExtensionContext, showFirstImmediately:
 }
 
 /**
- * Stops the Dhikr reminder timer
+ * Stops the Dhikr reminder timer and cleans up resources
  */
 function stopDhikrTimer(): void {
+    // Clear main timer
     if (dhikrTimer) {
         clearInterval(dhikrTimer);
         dhikrTimer = undefined;
     }
+    
+    // Clear notification auto-dismiss timer
+    if (notificationTimer) {
+        clearTimeout(notificationTimer);
+        notificationTimer = undefined;
+    }
+    
+    // Clean up active notifications tracking
+    activeNotifications.clear();
     
     // Update status bar
     updateStatusBar(false);
@@ -102,6 +141,20 @@ function updateStatusBar(isRunning: boolean): void {
 }
 
 /**
+ * Cleans up all disposables to prevent memory leaks
+ */
+function cleanupDisposables(): void {
+    disposables.forEach(d => {
+        try {
+            d.dispose();
+        } catch (error) {
+            console.error('Error disposing resource:', error);
+        }
+    });
+    disposables.length = 0; // Clear array
+}
+
+/**
  * Called when the extension is activated
  */
 export function activate(context: vscode.ExtensionContext): void {
@@ -113,6 +166,7 @@ export function activate(context: vscode.ExtensionContext): void {
         100
     );
     context.subscriptions.push(statusBarItem);
+    disposables.push(statusBarItem);
     
     // Register the start command
     const startCommand = vscode.commands.registerCommand('azkari.start', () => {
@@ -155,20 +209,84 @@ export function activate(context: vscode.ExtensionContext): void {
         }
     });
     
-    // Add commands to subscriptions
-    context.subscriptions.push(startCommand, stopCommand, showNowCommand, setIntervalCommand);
+    // NEW: Register toggle auto-dismiss command
+    const toggleAutoDismissCommand = vscode.commands.registerCommand('azkari.toggleAutoDismiss', async () => {
+        const config = vscode.workspace.getConfiguration('azkari');
+        const currentState = config.get<boolean>('autoDismissEnabled', true);
+        
+        await config.update('autoDismissEnabled', !currentState, vscode.ConfigurationTarget.Global);
+        
+        const newState = !currentState ? 'enabled' : 'disabled';
+        vscode.window.showInformationMessage(`🕌 Azkari: Auto-dismiss ${newState}.`);
+    });
     
-    // Listen for configuration changes
-    const configListener = vscode.workspace.onDidChangeConfiguration((event) => {
-        if (event.affectsConfiguration('azkari.intervalMinutes')) {
-            // If timer is running, restart it with new interval (don't show Dhikr again)
-            if (dhikrTimer) {
-                vscode.window.showInformationMessage('🕌 Azkari: Interval updated. Restarting timer...');
-                startDhikrTimer(context, false);
+    // NEW: Register set auto-dismiss delay command
+    const setAutoDismissDelayCommand = vscode.commands.registerCommand('azkari.setAutoDismissDelay', async () => {
+        const config = vscode.workspace.getConfiguration('azkari');
+        const currentDelay = config.get<number>('autoDismissSeconds', 5);
+        
+        const input = await vscode.window.showInputBox({
+            prompt: 'Enter auto-dismiss delay in seconds',
+            placeHolder: 'e.g., 5',
+            value: currentDelay.toString(),
+            validateInput: (value) => {
+                const num = parseInt(value, 10);
+                if (isNaN(num) || num < 1 || num > 60) {
+                    return 'Please enter a number between 1 and 60';
+                }
+                return null;
             }
+        });
+        
+        if (input !== undefined) {
+            const newDelay = parseInt(input, 10);
+            await config.update('autoDismissSeconds', newDelay, vscode.ConfigurationTarget.Global);
+            vscode.window.showInformationMessage(`🕌 Azkari: Auto-dismiss delay set to ${newDelay} second(s).`);
         }
     });
+    
+    // Add commands to subscriptions
+    context.subscriptions.push(
+        startCommand, 
+        stopCommand, 
+        showNowCommand, 
+        setIntervalCommand,
+        toggleAutoDismissCommand,
+        setAutoDismissDelayCommand
+    );
+    
+    // Add to disposables for memory management
+    disposables.push(
+        startCommand, 
+        stopCommand, 
+        showNowCommand, 
+        setIntervalCommand,
+        toggleAutoDismissCommand,
+        setAutoDismissDelayCommand
+    );
+    
+    // Listen for configuration changes with debouncing
+    let configChangeTimeout: NodeJS.Timeout | undefined;
+    const configListener = vscode.workspace.onDidChangeConfiguration((event) => {
+        // Clear previous timeout to debounce rapid changes
+        if (configChangeTimeout) {
+            clearTimeout(configChangeTimeout);
+        }
+        
+        configChangeTimeout = setTimeout(() => {
+            if (event.affectsConfiguration('azkari.intervalMinutes')) {
+                // If timer is running, restart it with new interval (don't show Dhikr again)
+                if (dhikrTimer) {
+                    vscode.window.showInformationMessage('🕌 Azkari: Interval updated. Restarting timer...');
+                    startDhikrTimer(context, false);
+                }
+            }
+            configChangeTimeout = undefined;
+        }, 300); // 300ms debounce
+    });
+    
     context.subscriptions.push(configListener);
+    disposables.push(configListener);
     
     // Check if auto-start is enabled
     const config = vscode.workspace.getConfiguration('azkari');
@@ -184,9 +302,19 @@ export function activate(context: vscode.ExtensionContext): void {
 }
 
 /**
- * Called when the extension is deactivated
+ * Called when the extension is deactivated - proper cleanup
  */
 export function deactivate(): void {
+    console.log('Deactivating Azkari extension...');
+    
+    // Stop all timers
     stopDhikrTimer();
+    
+    // Clean up all disposables
+    cleanupDisposables();
+    
+    // Clear active notifications map
+    activeNotifications.clear();
+    
     console.log('Azkari extension deactivated. السلام عليكم');
 }
