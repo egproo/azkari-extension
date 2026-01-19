@@ -1,8 +1,8 @@
 {
   "name": "azkari",
   "displayName": "Azkari - أذكاري",
-  "description": "Take Ager while you are coding",
-  "version": "1.0.0",
+  "description": "Take Ager while you are coding - Islamic Dhikr reminders with smart memory management",
+  "version": "1.1.0",
   "publisher": "Mohamed Emad",
   "icon": "images/icon.png",
   "engines": {
@@ -18,7 +18,10 @@
     "mindfulness",
     "spirituality",
     "arabic",
-    "reminders"
+    "reminders",
+    "notifications",
+    "productivity",
+    "wellness"
   ],
   "activationEvents": [
     "onStartupFinished"
@@ -28,54 +31,218 @@
     "commands": [
       {
         "command": "azkari.start",
-        "title": "Azkari: Start Dhikr Reminders"
+        "title": "Azkari: Start Dhikr Reminders",
+        "category": "Azkari",
+        "icon": "$(play)"
       },
       {
         "command": "azkari.stop",
-        "title": "Azkari: Stop Dhikr Reminders"
+        "title": "Azkari: Stop Dhikr Reminders",
+        "category": "Azkari",
+        "icon": "$(debug-stop)"
       },
       {
         "command": "azkari.showNow",
-        "title": "Azkari: Show Dhikr Now"
+        "title": "Azkari: Show Dhikr Now",
+        "category": "Azkari",
+        "icon": "$(eye)"
       },
       {
         "command": "azkari.setInterval",
-        "title": "Azkari: Set Dhikr Timer Interval"
+        "title": "Azkari: Set Dhikr Timer Interval",
+        "category": "Azkari",
+        "icon": "$(watch)"
+      },
+      {
+        "command": "azkari.toggleAutoDismiss",
+        "title": "Azkari: Toggle Auto-Dismiss Notifications",
+        "category": "Azkari",
+        "icon": "$(bell-slash)"
+      },
+      {
+        "command": "azkari.setAutoDismissDelay",
+        "title": "Azkari: Set Auto-Dismiss Delay",
+        "category": "Azkari",
+        "icon": "$(clock)"
+      },
+      {
+        "command": "azkari.resetCounter",
+        "title": "Azkari: Reset Dhikr Counter",
+        "category": "Azkari",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "azkari.showStats",
+        "title": "Azkari: Show Statistics",
+        "category": "Azkari",
+        "icon": "$(graph)"
       }
     ],
     "configuration": {
-      "title": "Azkari",
+      "title": "Azkari - أذكاري",
       "properties": {
         "azkari.intervalMinutes": {
           "type": "number",
           "default": 3,
           "minimum": 1,
           "maximum": 60,
-          "description": "Interval in minutes between Dhikr reminders."
+          "markdownDescription": "⏱️ Interval in minutes between Dhikr reminders.\n\n**Default:** `3 minutes`"
         },
         "azkari.autoStart": {
           "type": "boolean",
           "default": true,
-          "description": "Automatically start Dhikr reminders when VS Code opens."
+          "markdownDescription": "🚀 Automatically start Dhikr reminders when VS Code opens.\n\n**Default:** `true`"
+        },
+        "azkari.autoDismissEnabled": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "⚡ Automatically dismiss notifications after a set delay.\n\nThis helps reduce memory usage and keeps your workspace clean.\n\n**Default:** `true`"
+        },
+        "azkari.autoDismissSeconds": {
+          "type": "number",
+          "default": 5,
+          "minimum": 1,
+          "maximum": 60,
+          "markdownDescription": "⏳ Number of seconds before auto-dismissing notifications.\n\n**Range:** `1-60 seconds`\n\n**Default:** `5 seconds`"
+        },
+        "azkari.showInStatusBar": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "📊 Show Azkari status in the status bar.\n\n**Default:** `true`"
+        },
+        "azkari.notificationPosition": {
+          "type": "string",
+          "enum": [
+            "notification",
+            "status-bar-only"
+          ],
+          "default": "notification",
+          "markdownDescription": "📍 Where to display Dhikr reminders.\n\n- **notification**: Show as VS Code notifications\n- **status-bar-only**: Only update status bar (less intrusive)\n\n**Default:** `notification`"
+        },
+        "azkari.playSound": {
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "🔔 Play a gentle sound when showing Dhikr.\n\n**Note:** Requires sound file in extension.\n\n**Default:** `false`"
+        },
+        "azkari.pauseOnPresentation": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "🎤 Automatically pause reminders during presentations or screen sharing.\n\n**Default:** `true`"
+        },
+        "azkari.dhikrMode": {
+          "type": "string",
+          "enum": [
+            "sequential",
+            "random",
+            "single-favorite"
+          ],
+          "default": "sequential",
+          "enumDescriptions": [
+            "Show Dhikr in order",
+            "Show Dhikr randomly",
+            "Show only your favorite Dhikr"
+          ],
+          "markdownDescription": "🔄 How to cycle through Dhikr phrases.\n\n**Default:** `sequential`"
+        },
+        "azkari.enableStatistics": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "📈 Track and display Dhikr statistics.\n\n**Default:** `true`"
+        },
+        "azkari.quietHoursEnabled": {
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "🌙 Enable quiet hours (no notifications during specified times).\n\n**Default:** `false`"
+        },
+        "azkari.quietHoursStart": {
+          "type": "string",
+          "default": "22:00",
+          "pattern": "^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$",
+          "markdownDescription": "🌙 Quiet hours start time (24-hour format).\n\n**Example:** `22:00`"
+        },
+        "azkari.quietHoursEnd": {
+          "type": "string",
+          "default": "08:00",
+          "pattern": "^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$",
+          "markdownDescription": "🌅 Quiet hours end time (24-hour format).\n\n**Example:** `08:00`"
         }
       }
+    },
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "azkari.start",
+          "when": "true"
+        },
+        {
+          "command": "azkari.stop",
+          "when": "true"
+        },
+        {
+          "command": "azkari.showNow",
+          "when": "true"
+        },
+        {
+          "command": "azkari.setInterval",
+          "when": "true"
+        },
+        {
+          "command": "azkari.toggleAutoDismiss",
+          "when": "true"
+        },
+        {
+          "command": "azkari.setAutoDismissDelay",
+          "when": "true"
+        },
+        {
+          "command": "azkari.resetCounter",
+          "when": "config.azkari.enableStatistics"
+        },
+        {
+          "command": "azkari.showStats",
+          "when": "config.azkari.enableStatistics"
+        }
+      ]
     }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
-    "lint": "eslint src --ext ts"
+    "pretest": "npm run compile",
+    "lint": "eslint src --ext ts",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "package": "vsce package",
+    "publish": "vsce publish"
   },
   "devDependencies": {
     "@types/vscode": "^1.85.0",
     "@types/node": "^20.x",
     "typescript": "^5.3.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.50.0",
+    "prettier": "^3.0.0",
     "@vscode/vsce": "^2.22.0"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-username/azkari"
+    "url": "https://github.com/egproo/azkari-extension"
   },
-  "license": "MIT"
+  "bugs": {
+    "url": "https://github.com/egproo/azkari-extension/issues"
+  },
+  "homepage": "https://github.com/egproo/azkari-extension#readme",
+  "license": "MIT",
+  "badges": [
+    {
+      "url": "https://img.shields.io/badge/Made%20with-❤️-red",
+      "href": "https://github.com/egproo/azkari-extension",
+      "description": "Made with love"
+    }
+  ],
+  "galleryBanner": {
+    "color": "#1e7145",
+    "theme": "dark"
+  }
 }
