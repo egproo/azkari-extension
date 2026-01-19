@@ -1,54 +1,76 @@
-# Azkari - أذكاري 🤲
+# Azkari - أذكاري 🕌
 
-A spirituality and mindfulness VS Code extension that displays Arabic Dhikr (remembrances) as gentle, non-intrusive reminders while you code.
+> Islamic Dhikr reminders for developers - Keep your spirituality alive while coding!
 
-## Features
+## Features ✨
 
-- 🕌 **Sequential Dhikr Display**: Cycles through six beautiful Dhikr phrases one by one
-- ⏱️ **Configurable Interval**: Set your preferred reminder interval (default: 3 minutes)
-- 🎯 **Non-intrusive**: Uses VS Code's information messages for gentle reminders
-- 📊 **Status Bar Integration**: Quick access to start/stop reminders
-- 🚀 **Auto-start Option**: Automatically begins when VS Code opens
+- ⏰ **Customizable Timer**: Set reminders every 1-60 minutes
+- 🎯 **Smart Auto-Dismiss**: Notifications automatically close after 5 seconds (configurable)
+- 💾 **Memory Optimized**: Efficient resource management for better performance
+- 📊 **Statistics Tracking**: Monitor your daily, weekly, and monthly Dhikr count
+- 🌙 **Quiet Hours**: Pause notifications during specific hours
+- 🎨 **Multiple Display Modes**: Choose between notifications or status bar updates
+- 🔄 **Flexible Modes**: Sequential, random, or favorite Dhikr display
 
-## Dhikr Phrases Included
+## Installation 📦
 
-1. سُبْحَانَ اللَّهِ (SubhanAllah - Glory be to Allah)
-2. وَالْحَمْدُ لِلَّهِ (Alhamdulillah - Praise be to Allah)
-3. وَلَا إِلَهَ إِلَّا اللَّهُ (La ilaha illallah - There is no god but Allah)
-4. وَاللَّهُ أَكْبَرُ (Allahu Akbar - Allah is the Greatest)
-5. وَلَا حَوْل وَلَا قُوَّة إِلَّا بِاَلله (La hawla wa la quwwata illa billah - There is no power nor strength except with Allah)
-6. اللَّهُــمَّ صـَلِّ وَسَـــلِّمْ وبارك على سيدنا مُحمَّد وآله ﷺ (Salawat upon Prophet Muhammad ﷺ)
+1. Open VS Code
+2. Press `Ctrl+P` / `Cmd+P`
+3. Type `ext install azkari`
+4. Press Enter
 
-## Commands
+## Usage 🚀
 
-Open the Command Palette (`Cmd+Shift+P` / `Ctrl+Shift+P`) and type:
+### Commands
 
-| Command                            | Description                    |
-| ---------------------------------- | ------------------------------ |
-| `Azkari: Start Dhikr Reminders`    | Start the Dhikr reminder timer |
-| `Azkari: Stop Dhikr Reminders`     | Stop the Dhikr reminder timer  |
-| `Azkari: Show Dhikr Now`           | Display a Dhikr immediately    |
-| `Azkari: Set Dhikr Timer Interval` | Change the reminder interval   |
+- `Azkari: Start Dhikr Reminders` - Start the timer
+- `Azkari: Stop Dhikr Reminders` - Stop the timer
+- `Azkari: Show Dhikr Now` - Display Dhikr immediately
+- `Azkari: Set Dhikr Timer Interval` - Change reminder frequency
+- `Azkari: Toggle Auto-Dismiss` - Enable/disable auto-dismiss
+- `Azkari: Show Statistics` - View your Dhikr stats
+- `Azkari: Reset Counter` - Reset statistics
 
-## Settings
+### Settings
 
-Configure Azkari in your VS Code settings:
+Access via `File > Preferences > Settings` and search for "Azkari":
+```json
+{
+  "azkari.intervalMinutes": 3,
+  "azkari.autoContinue5:09 AMStart": true,
+"azkari.autoDismissEnabled": true,
+"azkari.autoDismissSeconds": 5,
+"azkari.dhikrMode": "sequential",
+"azkari.quietHoursEnabled": false,
+"azkari.enableStatistics": true
+}
 
-| Setting                  | Type    | Default | Description                                        |
-| ------------------------ | ------- | ------- | -------------------------------------------------- |
-| `azkari.intervalMinutes` | number  | 3       | Interval in minutes between Dhikr reminders (1-60) |
-| `azkari.autoStart`       | boolean | true    | Automatically start reminders when VS Code opens   |
+## Included Dhikr 📿
 
-## Installation
+1. سُبْحَانَ اللَّهِ (Glory be to Allah)
+2. الْحَمْدُ لِلَّهِ (Praise be to Allah)
+3. لَا إِلَهَ إِلَّا اللَّهُ (There is no god but Allah)
+4. اللَّهُ أَكْبَرُ (Allah is the Greatest)
+5. لَا حَوْل وَلَا قُوَّة إِلَّا بِاَلله (There is no power except with Allah)
+6. اللَّهُــمَّ صـَلِّ وَسَـــلِّمْ وبارك على سيدنا مُحمَّد وآله ﷺ (Blessings upon Prophet Muhammad)
 
-### From VSIX File
+## Contributing 🤝
 
-1. Download the `.vsix` file
-2. Open VS Code
-3. Press `Cmd+Shift+P` (Mac) or `Ctrl+Shift+P` (Windows/Linux)
-4. Type "Install from VSIX" and select the command
-5. Choose the downloaded `.vsix` file
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License 📄
+
+MIT License - feel free to use and modify!
+
+## Support ❤️
+
+If you find this extension helpful, please:
+- ⭐ Star the [GitHub repository](https://github.com/Mohamed-Emad1/azkari-extension)
+- 📝 Leave a review on VS Code Marketplace
+- 🤲 Make Dua for the developers
 
 ---
 
-**بارك الله فيكم** - May Allah bless you all 🤲
+**Made with ❤️ for the Muslim developer community**
+
+بارك الله فيكم
